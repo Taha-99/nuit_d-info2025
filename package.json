@@ -1,0 +1,25 @@
+{
+  "name": "ia-lowcost-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "IA Low-Cost Assistant – Offline-first public service hub",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:frontend": "npm install -w frontend",
+    "install:backend": "npm install -w backend",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "dev": "concurrently \"npm run dev -w frontend\" \"npm run dev -w backend\"",
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:backend": "npm run dev -w backend",
+    "build": "npm run build -w frontend && npm run build -w backend",
+    "test": "npm run test -w frontend && npm run test -w backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "NIRD Project",
+  "license": "MIT"
+}

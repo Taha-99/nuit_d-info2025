@@ -1,0 +1,228 @@
+const translations = {
+  fr: {
+    common: {
+      start: 'Commencer',
+      searchServices: 'Rechercher un service...',
+      online: 'En ligne',
+      offline: 'Hors ligne',
+      retry: 'Réessayer',
+      cancel: 'Annuler',
+      submit: 'Soumettre',
+      save: 'Enregistrer',
+      delete: 'Supprimer',
+      loading: 'Chargement...'
+    },
+    landing: {
+      headline: 'Assistant IA à faible coût',
+      subheading: 'Accédez aux services publics même avec une connexion limitée',
+      language: 'Langue',
+      betaTag: 'Itération bêta',
+      tryAssistant: 'Tester le copilote',
+      signals: {
+        resilience: 'Résilience bas débit',
+        hybrid: 'IA hybride edge + cloud',
+        sync: 'Synchronisation consciente',
+        security: 'Chiffrement citoyen',
+      },
+      feature: {
+        offlineTitle: 'Mode offline ultra léger',
+        offlineBody: 'Gardez les fiches critiques directement sur l’appareil et synchronisez en un clic.',
+        aiTitle: 'IA hybride locale + cloud',
+        aiBody: 'Mix entre modèles embarqués et API pour garantir réactivité et sobriété.',
+        syncTitle: 'Synchronisation consciente',
+        syncBody: 'Rejoue les actions locales et fusionne les données sans doublons.',
+      },
+      stats: {
+        availability: 'disponibilité',
+        languages: 'langues supportées',
+        services: 'services guidés',
+      },
+      timeline: {
+        collect: {
+          title: 'Capture terrain',
+          body: 'Collecte contextuelle même avec un signal fragile.',
+        },
+        assist: {
+          title: 'Guidage bilingue',
+          body: 'L’assistant contextualise les démarches et suggère les bons formulaires.',
+        },
+        sync: {
+          title: 'Synchronisation maîtrisée',
+          body: 'Les actions hors ligne sont rejouées dès que le réseau revient.',
+        },
+      },
+    },
+    dashboard: {
+      title: 'Tableau de bord',
+      subtitle: 'Recherchez, filtrez et reprenez vos démarches publiques depuis une seule console.',
+      quickLinks: 'Liens rapides',
+      recent: 'Activités récentes',
+      documents: 'Documents',
+      forms: 'Formulaires',
+      advice: 'Conseils juridiques',
+      gov: 'Services gouvernementaux',
+      empty: 'Pas encore de consultation',
+      ask: 'Questionner',
+      status: {
+        connectivity: 'Connectivité',
+        live: 'Flux en direct sécurisé',
+        cached: 'Consultation hors connexion',
+        sync: 'Synchronisation',
+        syncing: 'Synchronisation en cours',
+        synced: 'Cache aligné',
+        activity: 'Signal activités',
+        recentEntries: 'dernières actions suivies',
+        empty: 'Aucune donnée locale',
+      },
+    },
+    assistant: {
+      title: 'Assistant IA',
+      placeholder: 'Posez votre question...',
+      send: 'Envoyer',
+      thinking: 'Analyse en cours...',
+      offline: 'Mode hors ligne – réponses limitées disponibles',
+      online: 'Connecté au hub sécurisé',
+      backToServices: 'Retour aux services',
+      reset: 'Réinitialiser',
+      welcomeOnline: 'Bonjour, comment puis-je aider ?',
+      welcomeOffline: 'Assistant léger disponible hors ligne. Posez votre question.',
+      quickPrompts: {
+        status: 'Statut de mon dossier',
+        documents: 'Documents requis',
+        appointment: 'Planifier un rendez-vous',
+        aid: 'Aides disponibles',
+      },
+    },
+    services: {
+      steps: 'Étapes à suivre',
+      downloads: 'Formulaires à télécharger',
+      faq: 'Questions fréquentes',
+      contact: 'Contact'
+    },
+    about: {
+      title: 'À propos',
+      mission: "Notre mission est d'offrir un accès numérique inclusif aux services publics.",
+      credits: 'Crédits & remerciements'
+    },
+    nav: {
+      dashboard: 'Tableau de bord',
+      assistant: 'Assistant',
+      about: 'À propos',
+      admin: 'Admin'
+    }
+  },
+  ar: {
+    common: {
+      start: 'ابدأ',
+      searchServices: 'ابحث عن خدمة...',
+      online: 'متصل',
+      offline: 'غير متصل',
+      retry: 'أعد المحاولة',
+      cancel: 'إلغاء',
+      submit: 'إرسال',
+      save: 'حفظ',
+      delete: 'حذف',
+      loading: '...جارٍ التحميل'
+    },
+    landing: {
+      headline: 'مساعد الذكاء الاصطناعي منخفض التكلفة',
+      subheading: 'الوصول إلى الخدمات العامة حتى مع اتصال ضعيف',
+      language: 'اللغة',
+      betaTag: 'نسخة تجريبية',
+      tryAssistant: 'جرّب المساعد',
+      signals: {
+        resilience: 'صامد في الاتصال الضعيف',
+        hybrid: 'ذكاء اصطناعي هجين',
+        sync: 'مزامنة واعية',
+        security: 'حماية البيانات للمواطنين',
+      },
+      feature: {
+        offlineTitle: 'وضع غير متصل فائق الخفة',
+        offlineBody: 'احتفظ بأهم الملفات على الجهاز وقم بالمزامنة بضغطة واحدة.',
+        aiTitle: 'ذكاء اصطناعي هجين',
+        aiBody: 'مزيج من النماذج المحلية والسحابية لضمان سرعة وكفاءة.',
+        syncTitle: 'مزامنة ذكية',
+        syncBody: 'يعيد إرسال الأفعال المحلية ويدمج البيانات دون ازدواجية.',
+      },
+      stats: {
+        availability: 'جاهزية مستمرة',
+        languages: 'لغات مدعومة',
+        services: 'خدمات موجهة',
+      },
+      timeline: {
+        collect: {
+          title: 'التقاط السياق',
+          body: 'جمع المعلومات الأساسية حتى مع تغطية ضعيفة.',
+        },
+        assist: {
+          title: 'مرافقة ثنائية اللغة',
+          body: 'المساعد يشرح الخطوات ويقترح النماذج الصحيحة.',
+        },
+        sync: {
+          title: 'مزامنة مضبوطة',
+          body: 'تُعاد مزامنة الأفعال المحلية تلقائياً عند عودة الشبكة.',
+        },
+      },
+    },
+    dashboard: {
+      title: 'لوحة التحكم',
+      subtitle: 'ابحث وفلتر وتابع معاملاتك الحكومية من لوحة واحدة.',
+      quickLinks: 'روابط سريعة',
+      recent: 'النشاطات الأخيرة',
+      documents: 'المستندات',
+      forms: 'النماذج',
+      advice: 'استشارات قانونية',
+      gov: 'الخدمات الحكومية',
+      empty: 'لا توجد زيارات حديثة',
+      ask: 'اسأل',
+      status: {
+        connectivity: 'الاتصال',
+        live: 'تحديث مباشر آمن',
+        cached: 'استعراض دون اتصال',
+        sync: 'المزامنة',
+        syncing: 'جاري المزامنة',
+        synced: 'البيانات متطابقة',
+        activity: 'إشارات النشاط',
+        recentEntries: 'آخر الإجراءات المسجلة',
+        empty: 'لا توجد بيانات محلية',
+      },
+    },
+    assistant: {
+      title: 'مساعد الذكاء الاصطناعي',
+      placeholder: 'اكتب سؤالك...',
+      send: 'إرسال',
+      thinking: '...قيد المعالجة',
+      offline: 'وضع عدم الاتصال – إجابات محدودة',
+      online: 'متصل بالمركز الآمن',
+      backToServices: 'العودة للخدمات',
+      reset: 'إعادة المحادثة',
+      welcomeOnline: 'مرحباً، كيف أساعدك؟',
+      welcomeOffline: 'الوضع الخفيف متاح دون إنترنت، اسأل ما تحتاجه.',
+      quickPrompts: {
+        status: 'ما حالة ملفي؟',
+        documents: 'ما الوثائق المطلوبة؟',
+        appointment: 'أرغب في تحديد موعد',
+        aid: 'ما هي المساعدات المتاحة؟',
+      },
+    },
+    services: {
+      steps: 'الخطوات',
+      downloads: 'النماذج القابلة للتنزيل',
+      faq: 'الأسئلة الشائعة',
+      contact: 'جهات الاتصال'
+    },
+    about: {
+      title: 'نبذة',
+      mission: 'مهمتنا ضمان شمول رقمي للجميع.',
+      credits: 'الشكر والمساهمون'
+    },
+    nav: {
+      dashboard: 'الرئيسية',
+      assistant: 'المساعد',
+      about: 'حول',
+      admin: 'الإدارة'
+    }
+  }
+};
+
+export default translations;
