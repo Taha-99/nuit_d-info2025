@@ -1,16 +1,20 @@
-const path = require('path');
-const fs = require('fs');
-const Database = require('better-sqlite3');
+const mongoose = require('mongoose');
 
-const dataDir = path.join(__dirname, '..', '..', 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+const connectDB = async () => {
+  try {
+    const mongoURI = process.env.NODE_ENV === 'production' 
+      ? process.env.MONGODB_URI_PROD 
+      : process.env.MONGODB_URI || 'mongodb://localhost:27017/nuit';
+    
+    // Remove deprecated options for newer Mongoose versions
+    const conn = await mongoose.connect(mongoURI);
 
-const dbPath = process.env.DATABASE_PATH || path.join(dataDir, 'app.db');
-const db = new Database(dbPath);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    return conn;
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
+  }
+};
 
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
-
-module.exports = db;
+module.exports = connectDB;

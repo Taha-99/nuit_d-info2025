@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
-  Container,
   Typography,
   Paper,
   List,
@@ -31,55 +30,90 @@ const ServiceDetailsPage = () => {
   const { t } = useLanguage();
   const { isOnline, cacheRecord, getRecord, addRecentActivity } = useOffline();
   const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        let record;
+        let record = null;
+        
         if (isOnline) {
-          record = await getServiceById(id);
-          await cacheRecord('services', record);
+          try {
+            record = await getServiceById(id);
+            if (record) {
+              await cacheRecord('services', record);
+            }
+          } catch (apiError) {
+            console.warn('API fetch failed, trying cache:', apiError);
+            record = await getRecord('services', id);
+          }
         } else {
           record = await getRecord('services', id);
         }
-        setService(record);
-        if (record) {
-          await addRecentActivity({ serviceId: id, title: record.title });
+        
+        if (!record) {
+          setError('Service not found');
+        } else {
+          setService(record);
+          try {
+            await addRecentActivity({ serviceId: id, title: record.title });
+          } catch (e) {
+            console.warn('Failed to add recent activity:', e);
+          }
         }
       } catch (err) {
-        setError(err);
+        console.error('Error loading service:', err);
+        setError(err.message || 'Failed to load service');
+      } finally {
+        setLoading(false);
       }
     };
-    load();
-  }, [id, isOnline, cacheRecord, getRecord, addRecentActivity]);
+    
+    if (id) {
+      load();
+    }
+  }, [id, isOnline]);
+
+  if (loading) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
+        <NavBar />
+        <Box sx={{ py: 6, px: { xs: 2, sm: 4, md: 6 }, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <Typography>{t('common.loading')}</Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   if (error) {
     return (
-      <Box>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
         <NavBar />
-        <Container maxWidth="md" sx={{ py: 4 }}>
-          <Alert severity="error">{t('common.loading')}</Alert>
-        </Container>
+        <Box sx={{ py: 6, px: { xs: 2, sm: 4, md: 6 }, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
       </Box>
     );
   }
 
   if (!service) {
     return (
-      <Box>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
         <NavBar />
-        <Container maxWidth="md" sx={{ py: 4 }}>
-          <Typography>{t('common.loading')}</Typography>
-        </Container>
+        <Box sx={{ py: 6, px: { xs: 2, sm: 4, md: 6 }, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+          <Alert severity="warning">Service not found</Alert>
+        </Box>
       </Box>
     );
   }
 
   return (
-    <Box>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
       <NavBar />
-      <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box sx={{ py: 4, px: { xs: 2, sm: 4, md: 6 }, flex: 1, width: '100%', maxWidth: 900, mx: 'auto' }}>
         <Paper sx={{ p: 3, mb: 3 }}>
           <Typography variant="h4" fontWeight={700} gutterBottom>
             {service.title}
@@ -161,7 +195,7 @@ const ServiceDetailsPage = () => {
             )}
           </Stack>
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 };

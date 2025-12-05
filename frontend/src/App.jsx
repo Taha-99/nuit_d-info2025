@@ -9,6 +9,8 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { OfflineProvider } from './contexts/OfflineContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { ThemeModeProvider, useThemeMode } from './contexts/ThemeContext';
 
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
@@ -17,6 +19,11 @@ import ServiceDetailsPage from './pages/ServiceDetailsPage';
 import AboutPage from './pages/AboutPage';
 import AdminPanelPage from './pages/AdminPanelPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import DocumentTrackerPage from './pages/DocumentTrackerPage';
+import AppointmentPage from './pages/AppointmentPage';
+import HelpPage from './pages/HelpPage';
 
 const createEmotionCache = (direction) =>
   createCache({
@@ -26,22 +33,29 @@ const createEmotionCache = (direction) =>
 
 const InnerApp = () => {
   const { direction } = useLanguage();
+  const { mode } = useThemeMode();
 
   const theme = useMemo(
     () =>
       createTheme({
         direction,
         palette: {
-          mode: 'dark',
+          mode,
           primary: { main: '#8c6cff' },
           secondary: { main: '#4ef0d0' },
-          background: {
+          background: mode === 'dark' ? {
             default: '#03030a',
             paper: 'rgba(8, 12, 32, 0.82)',
+          } : {
+            default: '#f5f7fa',
+            paper: 'rgba(255, 255, 255, 0.95)',
           },
-          text: {
+          text: mode === 'dark' ? {
             primary: '#f4f7ff',
             secondary: 'rgba(244, 247, 255, 0.7)',
+          } : {
+            primary: '#1a1a2e',
+            secondary: 'rgba(26, 26, 46, 0.7)',
           },
         },
         typography: {
@@ -97,7 +111,7 @@ const InnerApp = () => {
           },
         },
       }),
-    [direction]
+    [direction, mode]
   );
 
   const cache = useMemo(() => createEmotionCache(direction), [direction]);
@@ -106,21 +120,28 @@ const InnerApp = () => {
     <CacheProvider value={cache}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <OfflineProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/assistant" element={<AssistantPage />} />
-                <Route path="/service/:id" element={<ServiceDetailsPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/admin" element={<AdminPanelPage />} />
-                <Route path="/login" element={<LoginPage />} />
-              </Routes>
-            </BrowserRouter>
-          </AuthProvider>
-        </OfflineProvider>
+        <NotificationProvider>
+          <OfflineProvider>
+            <AuthProvider>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/assistant" element={<AssistantPage />} />
+                  <Route path="/service/:id" element={<ServiceDetailsPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/admin" element={<AdminPanelPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/documents" element={<DocumentTrackerPage />} />
+                  <Route path="/appointments" element={<AppointmentPage />} />
+                  <Route path="/help" element={<HelpPage />} />
+                </Routes>
+              </BrowserRouter>
+            </AuthProvider>
+          </OfflineProvider>
+        </NotificationProvider>
       </ThemeProvider>
     </CacheProvider>
   );
@@ -128,7 +149,9 @@ const InnerApp = () => {
 
 const App = () => (
   <LanguageProvider>
-    <InnerApp />
+    <ThemeModeProvider>
+      <InnerApp />
+    </ThemeModeProvider>
   </LanguageProvider>
 );
 

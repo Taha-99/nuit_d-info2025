@@ -14,22 +14,31 @@ import {
   useMediaQuery,
   Chip,
   Stack,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import OfflineBadge from './OfflineBadge';
 import LanguageToggle from './LanguageToggle';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const NavBar = () => {
   const { t } = useLanguage();
+  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useMediaQuery('(max-width:900px)');
   const [open, setOpen] = React.useState(false);
+  const [userMenuAnchor, setUserMenuAnchor] = React.useState(null);
 
   const links = [
     { label: t('nav.dashboard'), path: '/dashboard' },
     { label: t('nav.assistant'), path: '/assistant' },
+    { label: t('nav.documents') || 'Documents', path: '/documents' },
+    { label: t('nav.appointments') || 'Rendez-vous', path: '/appointments' },
+    { label: t('nav.help') || 'Aide', path: '/help' },
     { label: t('nav.about'), path: '/about' },
   ];
 
@@ -66,6 +75,104 @@ const NavBar = () => {
         </Button>
       );
     });
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    setUserMenuAnchor(null);
+    navigate('/');
+  };
+
+  const renderAuthButtons = () => {
+    if (isAuthenticated) {
+      return (
+        <>
+          <IconButton
+            color="inherit"
+            onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+            sx={{
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 2,
+              px: 1,
+            }}
+          >
+            <AccountCircleIcon />
+            <Typography variant="body2" sx={{ ml: 1, display: { xs: 'none', sm: 'block' } }}>
+              {user?.name || user?.email}
+            </Typography>
+          </IconButton>
+          <Menu
+            anchorEl={userMenuAnchor}
+            open={Boolean(userMenuAnchor)}
+            onClose={handleUserMenuClose}
+            PaperProps={{
+              sx: {
+                background: 'rgba(8, 12, 32, 0.95)',
+                backdropFilter: 'blur(18px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                mt: 1,
+              },
+            }}
+          >
+            <MenuItem onClick={() => { navigate('/profile'); handleUserMenuClose(); }}>
+              {t('nav.profile') || 'Profil'}
+            </MenuItem>
+            <MenuItem onClick={() => { navigate('/dashboard'); handleUserMenuClose(); }}>
+              {t('nav.dashboard') || 'Dashboard'}
+            </MenuItem>
+            <MenuItem onClick={() => { navigate('/documents'); handleUserMenuClose(); }}>
+              {t('nav.documents') || 'Mes documents'}
+            </MenuItem>
+            <MenuItem onClick={() => { navigate('/appointments'); handleUserMenuClose(); }}>
+              {t('nav.appointments') || 'Mes rendez-vous'}
+            </MenuItem>
+            <MenuItem onClick={() => { navigate('/help'); handleUserMenuClose(); }}>
+              {t('nav.help') || 'Aide'}
+            </MenuItem>
+            {(user?.role === 'admin' || user?.role === 'moderator') && (
+              <MenuItem onClick={() => { navigate('/admin'); handleUserMenuClose(); }}>
+                Admin Panel
+              </MenuItem>
+            )}
+            <MenuItem onClick={handleLogout}>{t('auth.logout') || 'Déconnexion'}</MenuItem>
+          </Menu>
+        </>
+      );
+    }
+
+    return (
+      <Stack direction="row" spacing={1}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={() => navigate('/login')}
+          sx={{
+            borderColor: 'rgba(255,255,255,0.2)',
+            color: 'inherit',
+            textTransform: 'none',
+            borderRadius: 999,
+          }}
+        >
+          {t('auth.login') || 'Login'}
+        </Button>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => navigate('/register')}
+          sx={{
+            textTransform: 'none',
+            borderRadius: 999,
+            background: 'linear-gradient(135deg, #8c6cff, #4ef0d0)',
+          }}
+        >
+          {t('auth.register') || 'Register'}
+        </Button>
+      </Stack>
+    );
+  };
 
   return (
     <>
@@ -115,6 +222,7 @@ const NavBar = () => {
           {!isMobile && <Chip label="beta 0.9" color="secondary" variant="outlined" size="small" />}
           <OfflineBadge />
           <LanguageToggle />
+          {renderAuthButtons()}
         </Toolbar>
       </AppBar>
       <Drawer

@@ -25,7 +25,7 @@ const initDatabase = async () => {
   });
 };
 
-export const OfflineProvider = ({ children }) => {
+const OfflineProvider = ({ children }) => {
   const [db, setDb] = useState(null);
   const [online, setOnline] = useState(navigator.onLine);
   const [syncing, setSyncing] = useState(false);
@@ -104,10 +104,12 @@ export const OfflineProvider = ({ children }) => {
   return <OfflineContext.Provider value={value}>{children}</OfflineContext.Provider>;
 };
 
-export const useOffline = () => {
+const useOffline = () => {
   const context = useContext(OfflineContext);
   if (!context) {
     throw new Error('useOffline must be used inside OfflineProvider');
   }
   return context;
 };
+
+export { OfflineProvider, useOffline };

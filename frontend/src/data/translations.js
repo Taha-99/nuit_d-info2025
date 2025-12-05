@@ -86,6 +86,11 @@ const translations = {
       reset: 'Réinitialiser',
       welcomeOnline: 'Bonjour, comment puis-je aider ?',
       welcomeOffline: 'Assistant léger disponible hors ligne. Posez votre question.',
+      welcomeUser: 'Bienvenue {{name}}, comment puis-je vous aider ?',
+      errors: {
+        serverError: 'Une erreur est survenue, merci de réessayer.',
+        offline: 'Mode hors ligne activé. Fonctionnalités limitées.',
+      },
       quickPrompts: {
         status: 'Statut de mon dossier',
         documents: 'Documents requis',
@@ -108,8 +113,17 @@ const translations = {
       dashboard: 'Tableau de bord',
       assistant: 'Assistant',
       about: 'À propos',
-      admin: 'Admin'
-    }
+      admin: 'Admin',
+      documents: 'Documents',
+      appointments: 'Rendez-vous',
+      profile: 'Mon profil',
+      help: 'Aide',
+    },
+    auth: {
+      login: 'Connexion',
+      register: "S'inscrire",
+      logout: 'Déconnexion',
+    },
   },
   ar: {
     common: {
@@ -198,6 +212,11 @@ const translations = {
       reset: 'إعادة المحادثة',
       welcomeOnline: 'مرحباً، كيف أساعدك؟',
       welcomeOffline: 'الوضع الخفيف متاح دون إنترنت، اسأل ما تحتاجه.',
+      welcomeUser: 'أهلاً {{name}}، كيف يمكنني مساعدتك؟',
+      errors: {
+        serverError: 'حدث خطأ، يرجى المحاولة مرة أخرى.',
+        offline: 'تم تفعيل الوضع دون إنترنت. الوظائف محدودة.',
+      },
       quickPrompts: {
         status: 'ما حالة ملفي؟',
         documents: 'ما الوثائق المطلوبة؟',
@@ -220,8 +239,17 @@ const translations = {
       dashboard: 'الرئيسية',
       assistant: 'المساعد',
       about: 'حول',
-      admin: 'الإدارة'
-    }
+      admin: 'الإدارة',
+      documents: 'الوثائق',
+      appointments: 'المواعيد',
+      profile: 'ملفي الشخصي',
+      help: 'المساعدة',
+    },
+    auth: {
+      login: 'تسجيل الدخول',
+      register: 'إنشاء حساب',
+      logout: 'تسجيل الخروج',
+    },
   }
 };
 

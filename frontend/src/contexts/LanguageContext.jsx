@@ -3,7 +3,7 @@ import translations from '../data/translations';
 
 const LanguageContext = createContext();
 
-export const LanguageProvider = ({ children }) => {
+const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => localStorage.getItem('language') || 'fr');
 
   useEffect(() => {
@@ -27,10 +27,12 @@ export const LanguageProvider = ({ children }) => {
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
-export const useLanguage = () => {
+const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error('useLanguage must be used inside LanguageProvider');
   }
   return context;
 };
+
+export { LanguageProvider, useLanguage };

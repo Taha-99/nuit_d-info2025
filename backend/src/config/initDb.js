@@ -1,76 +1,78 @@
-const db = require('./database');
+const bcrypt = require('bcryptjs');
+const User = require('../models/userModel');
+const Service = require('../models/serviceModel');
 
-const createTables = () => {
-  db.prepare(`CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      role TEXT DEFAULT 'admin'
-    )`).run();
+const initializeDatabase = async () => {
+  try {
+    // Create default admin user if none exists
+    const adminExists = await User.findOne({ role: 'admin' });
+    if (!adminExists) {
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@nird.gov';
+      const adminPassword = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      
+      await User.create({
+        email: adminEmail,
+        password: hashedPassword,
+        role: 'admin',
+        name: 'System Administrator',
+        isActive: true
+      });
+      
+      console.log(`Default admin user created: ${adminEmail}`);
+    }
 
-  db.prepare(`CREATE TABLE IF NOT EXISTS services (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      description TEXT,
-      category TEXT,
-      steps TEXT,
-      forms TEXT,
-      faq TEXT,
-      contact TEXT
-    )`).run();
+    // Seed services if none exist
+    const serviceCount = await Service.countDocuments();
+    if (serviceCount === 0) {
+      const seedServices = [
+        {
+          id: 'svc_birth_certificate',
+          title: 'Acte de naissance',
+          description: 'Demande ou retrait d\'un acte de naissance officiel.',
+          category: 'documents',
+          steps: [
+            { order: 1, title: 'Préparer les pièces', description: 'Carte d\'identité + livret de famille.' },
+            { order: 2, title: 'Se rendre à la mairie', description: 'Déposer la demande au guichet.' },
+            { order: 3, title: 'Retirer le document', description: 'Revenir avec le récépissé.' }
+          ],
+          forms: [
+            { name: 'Formulaire CERFA', url: 'https://example.gov/forms/birth.pdf' }
+          ],
+          faq: [
+            { id: 'delais', question: 'Quels délais ?', answer: '24 à 72 heures selon la commune.' }
+          ],
+          contact: { phone: '+213-555-123456', email: 'etatcivil@example.gov' }
+        },
+        {
+          id: 'svc_passport',
+          title: 'Passeport biométrique',
+          description: 'Démarches pour obtenir un passeport biométrique.',
+          category: 'documents',
+          steps: [
+            { order: 1, title: 'Prendre rendez-vous', description: 'Via la plateforme officielle.' },
+            { order: 2, title: 'Déposer le dossier', description: 'Présenter les pièces et photos.' },
+            { order: 3, title: 'Suivre la production', description: 'Recevoir une notification SMS.' }
+          ],
+          forms: [
+            { name: 'Formulaire de demande', url: 'https://example.gov/forms/passport.pdf' }
+          ],
+          faq: [
+            { id: 'cout', question: 'Combien ça coûte ?', answer: '10 000 DA pour un adulte.' }
+          ],
+          contact: { phone: '+213-555-654321', email: 'passeport@example.gov' }
+        }
+      ];
 
-  db.prepare(`CREATE TABLE IF NOT EXISTS feedback (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      rating INTEGER,
-      comment TEXT,
-      suggestion TEXT,
-      createdAt INTEGER
-    )`).run();
+      await Service.insertMany(seedServices);
+      console.log('Default services seeded successfully');
+    }
 
-  const { count } = db.prepare('SELECT COUNT(*) as count FROM services').get();
-  if (count === 0) {
-    const insert = db.prepare(`INSERT INTO services (id, title, description, category, steps, forms, faq, contact)
-      VALUES (@id, @title, @description, @category, @steps, @forms, @faq, @contact)`);
-    const seedData = [
-      {
-        id: 'svc_birth_certificate',
-        title: 'Acte de naissance',
-        description: 'Demande ou retrait d\'un acte de naissance officiel.',
-        category: 'documents',
-        steps: JSON.stringify([
-          { order: 1, title: 'Préparer les pièces', description: 'Carte d\'identité + livret de famille.' },
-          { order: 2, title: 'Se rendre à la mairie', description: 'Déposer la demande au guichet.' },
-          { order: 3, title: 'Retirer le document', description: 'Revenir avec le récépissé.' }
-        ]),
-        forms: JSON.stringify([
-          { name: 'Formulaire CERFA', url: 'https://example.gov/forms/birth.pdf' }
-        ]),
-        faq: JSON.stringify([
-          { id: 'delais', question: 'Quels délais ?', answer: '24 à 72 heures selon la commune.' }
-        ]),
-        contact: JSON.stringify({ phone: '+213-555-123456', email: 'etatcivil@example.gov' })
-      },
-      {
-        id: 'svc_passport',
-        title: 'Passeport biométrique',
-        description: 'Démarches pour obtenir un passeport biométrique.',
-        category: 'documents',
-        steps: JSON.stringify([
-          { order: 1, title: 'Prendre rendez-vous', description: 'Via la plateforme officielle.' },
-          { order: 2, title: 'Déposer le dossier', description: 'Présenter les pièces et photos.' },
-          { order: 3, title: 'Suivre la production', description: 'Recevoir une notification SMS.' }
-        ]),
-        forms: JSON.stringify([
-          { name: 'Formulaire de demande', url: 'https://example.gov/forms/passport.pdf' }
-        ]),
-        faq: JSON.stringify([
-          { id: 'cout', question: 'Combien ça coûte ?', answer: '10 000 DA pour un adulte.' }
-        ]),
-        contact: JSON.stringify({ phone: '+213-555-654321', email: 'passeport@example.gov' })
-      }
-    ];
-    seedData.forEach((row) => insert.run(row));
+    console.log('Database initialization completed');
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    throw error;
   }
 };
 
-module.exports = createTables;
+module.exports = initializeDatabase;

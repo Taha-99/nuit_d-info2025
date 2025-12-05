@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
-  Container,
   Grid,
   Paper,
   Stack,
@@ -69,9 +68,9 @@ const DashboardPage = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default', width: '100%' }}>
       <NavBar />
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ py: 4, px: { xs: 2, sm: 4, md: 6 }, flex: 1, width: '100%' }}>
         <Stack spacing={4}>
           <Paper
             sx={{
@@ -205,7 +204,7 @@ const DashboardPage = () => {
             </Grid>
           </Grid>
         </Stack>
-      </Container>
+      </Box>
     </Box>
   );
 };

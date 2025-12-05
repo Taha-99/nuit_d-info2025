@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
-  Container,
   Paper,
   Stack,
   Typography,
@@ -69,9 +68,9 @@ const LandingPage = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', background: 'transparent' }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'transparent', width: '100%' }}>
       <NavBar />
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
+      <Box sx={{ py: { xs: 6, md: 10 }, px: { xs: 2, sm: 4, md: 6 }, flex: 1, width: '100%' }}>
         <Stack spacing={6}>
           <Paper
             sx={{
@@ -212,7 +211,7 @@ const LandingPage = () => {
             </Grid>
           </Paper>
         </Stack>
-      </Container>
+      </Box>
     </Box>
   );
 };
