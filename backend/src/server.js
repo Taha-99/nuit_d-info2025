@@ -126,13 +126,13 @@ const startServer = async () => {
     console.log('Initializing database...');
     await initializeDatabase();
     
-    // Test OpenRouter API connection (optional)
+    // Test Qwen API connection (optional)
     try {
       const qwenService = require('./services/qwenService');
       await qwenService.testConnection();
     } catch (error) {
-      console.warn('⚠️  OpenRouter API connection failed:', error.message);
-      console.warn('🚧 Continuing without AI embeddings. AI features will use fallback responses.');
+      console.warn('⚠️  Qwen API connection failed:', error.message);
+      console.warn('🚧 Continuing without local AI service. AI features will use fallback responses.');
       // Don't exit - continue without embeddings API
     }
     

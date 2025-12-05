@@ -58,6 +58,42 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ChatIcon from '@mui/icons-material/Chat';
 
+const slugifyId = (value = '') =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 60);
+
+const categoryOptions = [
+  { value: 'documents', fr: 'Documents officiels', ar: 'الوثائق الرسمية' },
+  { value: 'health', fr: 'Santé', ar: 'الصحة' },
+  { value: 'education', fr: 'Éducation', ar: 'التعليم' },
+  { value: 'social', fr: 'Services sociaux', ar: 'الخدمات الاجتماعية' },
+  { value: 'administrative', fr: 'Administratif', ar: 'المعاملات الإدارية' },
+  { value: 'legal', fr: 'Légal', ar: 'القانون' },
+  { value: 'other', fr: 'Autre', ar: 'أخرى' },
+];
+
+const languageOptions = [
+  { value: 'fr', labelFr: 'Français', labelAr: 'فرنسي' },
+  { value: 'ar', labelFr: 'Arabe', labelAr: 'عربي' },
+  { value: 'both', labelFr: 'Bilingue', labelAr: 'لغتان' },
+];
+
+const createEmptyServiceForm = () => ({
+  id: '',
+  title: '',
+  titleAr: '',
+  description: '',
+  descriptionAr: '',
+  category: 'documents',
+  icon: '',
+  language: 'fr',
+});
+
 const AdminPanelPage = () => {
   const { user, isAuthenticated } = useAuth();
   const { language } = useLanguage();
@@ -82,9 +118,7 @@ const AdminPanelPage = () => {
   const [services, setServices] = useState([]);
   const [serviceDialog, setServiceDialog] = useState(false);
   const [editingService, setEditingService] = useState(null);
-  const [serviceForm, setServiceForm] = useState({
-    title: '', titleAr: '', description: '', descriptionAr: '', category: '', icon: ''
-  });
+  const [serviceForm, setServiceForm] = useState(createEmptyServiceForm());
   
   // Feedback
   const [feedbackList, setFeedbackList] = useState([]);
@@ -142,27 +176,37 @@ const AdminPanelPage = () => {
     if (service) {
       setEditingService(service);
       setServiceForm({
+        id: service.id || service._id || '',
         title: service.title || '',
         titleAr: service.titleAr || '',
         description: service.description || '',
         descriptionAr: service.descriptionAr || '',
-        category: service.category || '',
+        category: service.category || 'documents',
         icon: service.icon || '',
+        language: service.language || 'fr',
       });
     } else {
       setEditingService(null);
-      setServiceForm({ title: '', titleAr: '', description: '', descriptionAr: '', category: '', icon: '' });
+      setServiceForm(createEmptyServiceForm());
     }
     setServiceDialog(true);
   };
 
   const handleSaveService = async () => {
     try {
+      const normalizedId = slugifyId(serviceForm.id);
+      if (!normalizedId) {
+        showError(language === 'ar' ? 'مطلوب معرف صحيح للخدمة' : 'Un identifiant de service valide est requis');
+        return;
+      }
+
+      const payload = { ...serviceForm, id: normalizedId };
+
       if (editingService) {
-        await api.updateService(editingService._id, serviceForm);
+        await api.updateService(editingService._id, payload);
         success(language === 'ar' ? 'تم التحديث' : 'Service mis à jour');
       } else {
-        await api.createService(serviceForm);
+        await api.createService(payload);
         success(language === 'ar' ? 'تم الإنشاء' : 'Service créé');
       }
       setServiceDialog(false);
@@ -229,8 +273,6 @@ const AdminPanelPage = () => {
     { icon: <PendingIcon />, label: language === 'ar' ? 'وثائق معلقة' : 'Docs en attente', value: stats.pendingDocuments, color: '#f48fb1' },
     { icon: <TrendingUpIcon />, label: language === 'ar' ? 'التقييم' : 'Note moy.', value: stats.avgRating?.toFixed(1) || '0', color: '#81c784' },
   ];
-
-  const categories = ['identity', 'civil', 'transport', 'social', 'education', 'health', 'business', 'other'];
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -551,12 +593,47 @@ const AdminPanelPage = () => {
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 2 }}>
             <Grid container spacing={2}>
+              <Grid item xs={12} md={8}>
+                <TextField
+                  fullWidth
+                  label={language === 'ar' ? 'معرّف الخدمة (slug)' : 'Identifiant service (slug)'}
+                  value={serviceForm.id}
+                  onChange={(e) => setServiceForm((prev) => ({
+                    ...prev,
+                    id: editingService ? prev.id : slugifyId(e.target.value),
+                  }))}
+                  helperText={language === 'ar' ? 'أحرف صغيرة بدون فراغات. يستخدم في مسارات الخدمة.' : 'Minuscules sans espaces. Sert pour les URLs de service.'}
+                  disabled={Boolean(editingService)}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>{language === 'ar' ? 'اللغة' : 'Langue'}</InputLabel>
+                  <Select
+                    value={serviceForm.language}
+                    label={language === 'ar' ? 'اللغة' : 'Langue'}
+                    onChange={(e) => setServiceForm((prev) => ({ ...prev, language: e.target.value }))}
+                  >
+                    {languageOptions.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {language === 'ar' ? opt.labelAr : opt.labelFr}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label={language === 'ar' ? 'العنوان (فرنسي)' : 'Titre (FR)'}
                   value={serviceForm.title}
-                  onChange={(e) => setServiceForm(p => ({ ...p, title: e.target.value }))}
+                  onChange={(e) => setServiceForm((prev) => ({
+                    ...prev,
+                    title: e.target.value,
+                    ...(editingService ? {} : { id: slugifyId(e.target.value) }),
+                  }))}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -599,8 +676,10 @@ const AdminPanelPage = () => {
                     label="Catégorie"
                     onChange={(e) => setServiceForm(p => ({ ...p, category: e.target.value }))}
                   >
-                    {categories.map(cat => (
-                      <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                    {categoryOptions.map((cat) => (
+                      <MenuItem key={cat.value} value={cat.value}>
+                        {language === 'ar' ? cat.ar : cat.fr}
+                      </MenuItem>
                     ))}
                   </Select>
                 </FormControl>

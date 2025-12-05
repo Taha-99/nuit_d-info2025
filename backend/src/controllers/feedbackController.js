@@ -1,5 +1,20 @@
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const Feedback = require('../models/feedbackModel');
+const Service = require('../models/serviceModel');
+
+const resolveServiceObjectId = async (serviceIdentifier) => {
+  if (!serviceIdentifier) {
+    return null;
+  }
+
+  if (mongoose.Types.ObjectId.isValid(serviceIdentifier)) {
+    return serviceIdentifier;
+  }
+
+  const service = await Service.findOne({ id: serviceIdentifier }).select('_id');
+  return service ? service._id : null;
+};
 
 // Submit new feedback
 const submitFeedback = async (req, res) => {
@@ -38,7 +53,10 @@ const submitFeedback = async (req, res) => {
 
     // Add service ID if provided
     if (serviceId) {
-      feedbackData.serviceId = serviceId;
+      const resolvedServiceId = await resolveServiceObjectId(serviceId);
+      if (resolvedServiceId) {
+        feedbackData.serviceId = resolvedServiceId;
+      }
     }
 
     // Add conversation ID if provided
@@ -91,7 +109,13 @@ const getFeedback = async (req, res) => {
     
     if (status) query.status = status;
     if (category) query.category = category;
-    if (serviceId) query.serviceId = serviceId;
+    if (serviceId) {
+      const resolvedServiceId = await resolveServiceObjectId(serviceId);
+      if (!resolvedServiceId) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+      query.serviceId = resolvedServiceId;
+    }
     if (minRating) query.rating = { ...query.rating, $gte: parseInt(minRating) };
     if (maxRating) query.rating = { ...query.rating, $lte: parseInt(maxRating) };
 

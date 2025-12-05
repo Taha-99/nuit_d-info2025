@@ -8,12 +8,12 @@ const initializeDatabase = async () => {
     const adminExists = await User.findOne({ role: 'admin' });
     if (!adminExists) {
       const adminEmail = process.env.ADMIN_EMAIL || 'admin@nird.gov';
-      const adminPassword = process.env.ADMIN_PASSWORD || 'ChangeMe123!';
-      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      const adminPassword = process.env.ADMIN_PASSWORD || 'password';
       
+      // Don't hash here - the userModel pre('save') hook will hash it
       await User.create({
         email: adminEmail,
-        password: hashedPassword,
+        password: adminPassword,
         role: 'admin',
         name: 'System Administrator',
         isActive: true

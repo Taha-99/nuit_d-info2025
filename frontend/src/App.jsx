@@ -24,6 +24,7 @@ import ProfilePage from './pages/ProfilePage';
 import DocumentTrackerPage from './pages/DocumentTrackerPage';
 import AppointmentPage from './pages/AppointmentPage';
 import HelpPage from './pages/HelpPage';
+import FeedbackPage from './pages/FeedbackPage';
 
 const createEmotionCache = (direction) =>
   createCache({
@@ -137,6 +138,7 @@ const InnerApp = () => {
                   <Route path="/documents" element={<DocumentTrackerPage />} />
                   <Route path="/appointments" element={<AppointmentPage />} />
                   <Route path="/help" element={<HelpPage />} />
+                  <Route path="/feedback" element={<FeedbackPage />} />
                 </Routes>
               </BrowserRouter>
             </AuthProvider>

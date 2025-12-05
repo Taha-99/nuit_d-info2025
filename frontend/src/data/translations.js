@@ -118,6 +118,7 @@ const translations = {
       appointments: 'Rendez-vous',
       profile: 'Mon profil',
       help: 'Aide',
+      feedback: 'Feedback',
     },
     auth: {
       login: 'Connexion',
@@ -244,6 +245,7 @@ const translations = {
       appointments: 'المواعيد',
       profile: 'ملفي الشخصي',
       help: 'المساعدة',
+      feedback: 'ملاحظات',
     },
     auth: {
       login: 'تسجيل الدخول',

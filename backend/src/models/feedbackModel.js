@@ -7,9 +7,9 @@ const feedbackSchema = new mongoose.Schema({
     required: false // Allow anonymous feedback
   },
   serviceId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Service',
-    required: false // General feedback if not service-specific
+    required: false
   },
   conversationId: {
     type: mongoose.Schema.Types.ObjectId,

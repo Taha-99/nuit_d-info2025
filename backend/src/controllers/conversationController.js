@@ -1,6 +1,93 @@
 const Conversation = require('../models/conversationModel');
 const User = require('../models/userModel');
+const Service = require('../models/serviceModel');
 const qwenService = require('../services/qwenService');
+
+const formatServiceAnswer = (service, language = 'fr') => {
+  if (!service) return null;
+  const isArabic = language === 'ar';
+  const header = isArabic
+    ? `إليك خطوات خدمة ${service.title} :`
+    : `Voici les informations clés pour ${service.title} :`;
+
+  const orderedSteps = (service.steps || [])
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .slice(0, 4)
+    .map((step) => `${step.order}. ${step.title} – ${step.description}`)
+    .join('\n');
+
+  const docs = service.metadata?.requiredDocuments?.length
+    ? (isArabic ? 'الوثائق المطلوبة:' : 'Documents requis :') +
+      '\n- ' + service.metadata.requiredDocuments.slice(0, 6).join('\n- ')
+    : '';
+
+  const forms = service.forms?.length
+    ? (isArabic ? 'النماذج المتوفرة:' : 'Formulaires utiles :') +
+      '\n- ' + service.forms.map((f) => `${f.name} (${f.language || 'fr'})`).slice(0, 3).join('\n- ')
+    : '';
+
+  const extra = service.metadata?.eligibility?.length
+    ? (isArabic ? 'شروط الأهلية:' : 'Conditions d’éligibilité :') +
+      '\n- ' + service.metadata.eligibility.slice(0, 5).join('\n- ')
+    : '';
+
+  const lines = [header];
+  if (orderedSteps) lines.push(isArabic ? 'الخطوات:' : 'Étapes :', orderedSteps);
+  if (docs) lines.push('', docs);
+  if (forms) lines.push('', forms);
+  if (extra) lines.push('', extra);
+  lines.push('', isArabic ? 'قدّم الملف في أقرب بلدية أو مؤسسة مختصة.' : 'Déposez le dossier auprès de l’APC/daïra la plus proche.');
+
+  return lines.join('\n');
+};
+
+const buildKnowledgeFallback = async (question = '', language = 'fr') => {
+  if (!question.trim()) return null;
+
+  try {
+    const textQuery = question.trim();
+    const services = await Service.find(
+      {
+        isActive: true,
+        $text: { $search: textQuery }
+      },
+      {
+        score: { $meta: 'textScore' },
+        title: 1,
+        description: 1,
+        steps: 1,
+        forms: 1,
+        metadata: 1,
+        category: 1
+      }
+    )
+      .sort({ score: { $meta: 'textScore' } })
+      .limit(1)
+      .lean();
+
+    if (services.length > 0) {
+      return formatServiceAnswer(services[0], language);
+    }
+
+    // Fallback: keyword match on title/description
+    const regex = new RegExp(textQuery.split(/\s+/).slice(0, 3).join('|'), 'i');
+    const fallbackService = await Service.findOne({
+      isActive: true,
+      $or: [{ title: regex }, { description: regex }]
+    })
+      .select('title description steps forms metadata')
+      .lean();
+
+    if (fallbackService) {
+      return formatServiceAnswer(fallbackService, language);
+    }
+  } catch (error) {
+    console.warn('Knowledge fallback failed:', error.message);
+  }
+
+  return null;
+};
 
 // Get all conversations for a user
 const getUserConversations = async (req, res) => {
@@ -212,6 +299,7 @@ const generateResponse = async (req, res) => {
     let responseContent;
     try {
       const aiResponse = await qwenService.generateChatResponse(chatHistory, {
+        conversationId: conversationId,
         systemPrompt: `Tu es un assistant gouvernemental intelligent pour les citoyens tunisiens et algériens.
 Tu aides les utilisateurs à comprendre les démarches administratives, les documents nécessaires et les procédures.
 Services disponibles: acte de naissance, passeport biométrique, carte d'identité, permis de conduire, etc.
@@ -227,6 +315,10 @@ ${context ? `Contexte supplémentaire: ${context}` : ''}`
     }
     
     // Fallback response if AI fails
+    if (!responseContent) {
+      responseContent = await buildKnowledgeFallback(userMessage, conversation.language || 'fr');
+    }
+
     if (!responseContent) {
       responseContent = `Je vous remercie pour votre question. Malheureusement, je ne peux pas vous répondre en ce moment. 
 Veuillez consulter notre section FAQ ou contacter directement le service concerné.

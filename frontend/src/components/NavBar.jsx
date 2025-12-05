@@ -38,6 +38,7 @@ const NavBar = () => {
     { label: t('nav.assistant'), path: '/assistant' },
     { label: t('nav.documents') || 'Documents', path: '/documents' },
     { label: t('nav.appointments') || 'Rendez-vous', path: '/appointments' },
+    { label: t('nav.feedback') || 'Feedback', path: '/feedback' },
     { label: t('nav.help') || 'Aide', path: '/help' },
     { label: t('nav.about'), path: '/about' },
   ];
